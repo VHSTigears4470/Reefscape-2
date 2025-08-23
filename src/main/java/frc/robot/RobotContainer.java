@@ -4,13 +4,13 @@
 
 package frc.robot;
 
-import frc.robot.Constants.OI;
-import frc.robot.Constants.Operating;
-import frc.robot.subsystems.DriveSubsystem;
-import edu.wpi.first.math.MathUtil;
+import frc.robot.commands.DriveMotors;
+import frc.robot.subsystems.TestMotorsSubsystem;
+
+
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -18,43 +18,66 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
  * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
  * subsystems, commands, and trigger mappings) should be declared here.
  */
-
-//add PathPlanner stuff later
 public class RobotContainer {
-  private DriveSubsystem m_driveSub;
-
+  
+  // Replace with CommandPS4Controller or CommandJoystick if needed
   private final CommandXboxController m_driverController =
-      new CommandXboxController(OI.Constants.k_driverControllerPort);
+      new CommandXboxController(0);
+  private TestMotorsSubsystem testMotor;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+     initSubsystems();    
     // Configure the trigger bindings
-    initSubystems();
     configureBindings();
   }
 
-  public void initSubystems() {
-    if(Operating.Constants.k_usingDrive) {
-      m_driveSub = new DriveSubsystem();
-      m_driveSub.setDefaultCommand(new RunCommand(
-        () -> m_driveSub.drive(
-                  OI.Constants.k_driverYAxisInverted * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.k_driverAxisY), OI.Constants.k_driveDeadband),
-                  OI.Constants.k_driverXAxisInverted * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.k_driverAxisX), OI.Constants.k_driveDeadband),
-                  OI.Constants.k_driverRotAxisInverted * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.k_driverAxisRot), OI.Constants.k_driveDeadband), 
-                  true,
-                  "Default / Field Oriented"
-        ),
-        m_driveSub));
-    } // extend if-else chain for other subsystems
+  private void initSubsystems() {
+      testMotor = new TestMotorsSubsystem(1);
   }
 
-  
+  /**
+   * Use this method to define your trigger->command mappings. Triggers can be created via the
+   * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
+   * predicate, or via the named factories in {@link
+   * edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses for {@link
+   * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
+   * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
+   * joysticks}.
+   */
   private void configureBindings() {
-    //apply later
+    int preset = 1;
+    switch (preset) {
+            default:
+                    controllerPresetMain();
+                    break;
+    }
   }
 
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
   public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return null;
+        return null;
   }
+
+  // Presets
+  /**
+   * The default / main preset used for comps
+   * Does the following: 
+   *    
+   */
+ 
+  public void controllerPresetMain() { //subject to change (while/on true)
+        double speed = 0.35;
+        m_driverController.y().whileTrue(new DriveMotors(testMotor, speed));
+      //   m_driverController.y().whileTrue(new DriveMotors(frontRightTurn, speed));
+      //   m_driverController.x().whileTrue(new DriveMotors(frontRightTurn, -speed));
+        
+      //   m_driverController.b().whileTrue(new DriveMotors(rearRightDrive, speed));
+      //   m_driverController.a().whileTrue(new DriveMotors(rearRightDrive, -speed));
+  }
+
 }

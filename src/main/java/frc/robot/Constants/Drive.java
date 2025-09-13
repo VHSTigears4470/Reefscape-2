@@ -20,10 +20,10 @@ public final class Drive {
             new Translation2d(-k_wheelBase / 2, -k_trackWidth / 2)); //Back Right
 
         //update(?)
-        public static final double k_frontLeftChassisAngularOffset = -Math.PI / 2;
-        public static final double k_backLeftChassisAngularOffset =  Math.PI;
+        public static final double k_frontLeftChassisAngularOffset = 0;
+        public static final double k_backLeftChassisAngularOffset =  0;
         public static final double k_frontRightChassisAngularOffset = 0;
-        public static final double k_backRightChassisAngularOffset = Math.PI / 2;
+        public static final double k_backRightChassisAngularOffset = 0;
 
 
         //update

@@ -6,7 +6,10 @@ package frc.robot;
 
 import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
+import frc.robot.commands.TestElevator;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem.Setpoint;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -22,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 //add PathPlanner stuff later
 public class RobotContainer {
   private DriveSubsystem m_driveSub;
+  private ElevatorSubsystem m_elevatorSub;
 
   private final CommandXboxController m_driverController =
       new CommandXboxController(OI.Constants.k_driverControllerPort);
@@ -45,12 +49,18 @@ public class RobotContainer {
                   "Default / Field Oriented"
         ),
         m_driveSub));
-    } // extend if-else chain for other subsystems
+    } 
+    if(Operating.Constants.k_usingElevator) {
+      m_elevatorSub = new ElevatorSubsystem();
+    } 
+    // extend if-else chain for other subsystems
   }
 
   
   private void configureBindings() {
     //apply later
+    m_driverController.y().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kFeederStation));
+    m_driverController.x().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel1));
   }
 
   public Command getAutonomousCommand() {

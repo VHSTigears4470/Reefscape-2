@@ -4,23 +4,19 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.SwerveModule;
+import frc.robot.subsystems.ElevatorSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 
 /** An example command that uses an example subsystem. */
-public class ExampleCommand extends Command {
-  @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final SwerveModule m_subsystem;
+public class TestElevator extends Command {
+  private final ElevatorSubsystem m_eleavtorSub;
+  private final double d_speed;
 
-  /**
-   * Creates a new ExampleCommand.
-   *
-   * @param subsystem The subsystem used by this command.
-   */
-  public ExampleCommand(SwerveModule subsystem) {
-    m_subsystem = subsystem;
+  public TestElevator(ElevatorSubsystem p_subsystem, double p_speed) {
+    m_eleavtorSub = p_subsystem;
+    d_speed = p_speed;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(subsystem);
+    addRequirements(p_subsystem);
   }
 
   // Called when the command is initially scheduled.
@@ -29,11 +25,15 @@ public class ExampleCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    m_eleavtorSub.testDrive(d_speed);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {}
+  public void end(boolean interrupted) {
+    m_eleavtorSub.stopMotors();
+  }
 
   // Returns true when the command should end.
   @Override

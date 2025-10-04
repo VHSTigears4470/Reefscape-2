@@ -104,27 +104,27 @@ public final class Configs {
             elevatorConfigRight.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control - Edit
-                .p(0.1)
+                .p(0.08)
                 .outputRange(-1, 1)
                 .maxMotion
                 // Set MAXMotion parameters for position control - Edit
-                .maxVelocity(4200)
-                .maxAcceleration(6000)
+                .maxVelocity(4200) 
+                .maxAcceleration(6000) 
                 .allowedClosedLoopError(0.5);
             elevatorConfigLeft
                 .idleMode(IdleMode.kCoast)
                 .smartCurrentLimit(50)
-                .voltageCompensation(12)
-                .follow(ElevatorConstants.k_elevatorRightID);
+                .inverted(false)
+                .voltageCompensation(12);
             elevatorConfigLeft.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control - Edit
-                .p(0.1)
+                .p(0.08)
                 .outputRange(-1, 1)
                 .maxMotion
                 // Set MAXMotion parameters for position control - Edit
-                .maxVelocity(4200)
-                .maxAcceleration(6000)
+                .maxVelocity(4200) 
+                .maxAcceleration(600) 
                 .allowedClosedLoopError(0.5);
         }
     }

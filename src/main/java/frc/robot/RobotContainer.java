@@ -33,7 +33,7 @@ public class RobotContainer {
   }
 
   private void initSubsystems() {
-      testMotor = new TestMotorsSubsystem(1);
+      testMotor = new TestMotorsSubsystem(19, 20);
   }
 
   /**
@@ -71,8 +71,9 @@ public class RobotContainer {
    */
  
   public void controllerPresetMain() { //subject to change (while/on true)
-        double speed = 0.35;
+        double speed = 0.1;
         m_driverController.y().whileTrue(new DriveMotors(testMotor, speed));
+        m_driverController.x().whileTrue(new DriveMotors(testMotor, -speed));
       //   m_driverController.y().whileTrue(new DriveMotors(frontRightTurn, speed));
       //   m_driverController.x().whileTrue(new DriveMotors(frontRightTurn, -speed));
         

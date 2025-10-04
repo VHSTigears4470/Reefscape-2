@@ -16,8 +16,10 @@ public class IDs {
         public static final int k_pigeon2ID = 10;
     }
     public static final class ElevatorConstants {
-        public static final int k_elevatorRightID = 10;
-        public static final int k_elevatorLeftID = 11;
-        public static final int k_elevatorSwitchID = 12;
+        public static final int k_elevatorRightID = 19;
+        public static final int k_elevatorLeftID = 20;
+        public static final int k_elevatorSwitchTopID = 0;
+        public static final int k_elevatorSwitchBottomID = 1;
+
     }
 }

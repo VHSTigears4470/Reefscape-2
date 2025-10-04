@@ -40,7 +40,7 @@ public final class Configs {
             k_frontLeftDriveConfig
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(true);
+                .inverted(false);
             k_frontLeftDriveConfig.encoder
                 .positionConversionFactor(d_drivingFactor) //meters
                 .velocityConversionFactor(d_drivingFactor / 60.0);
@@ -53,7 +53,7 @@ public final class Configs {
             k_frontRightDriveConfig
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(false);
+                .inverted(true);
             k_frontRightDriveConfig.encoder
                 .positionConversionFactor(d_drivingFactor) //meters
                 .velocityConversionFactor(d_drivingFactor / 60.0);
@@ -66,7 +66,7 @@ public final class Configs {
             k_backLeftDriveConfig
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(true);
+                .inverted(false);
             k_backLeftDriveConfig.encoder
                 .positionConversionFactor(d_drivingFactor) //meters
                 .velocityConversionFactor(d_drivingFactor / 60.0);
@@ -79,7 +79,7 @@ public final class Configs {
             k_backRightDriveConfig
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(50)
-                .inverted(true);
+                .inverted(false);
             k_backRightDriveConfig.encoder
                 .positionConversionFactor(d_drivingFactor) //meters
                 .velocityConversionFactor(d_drivingFactor / 60.0);

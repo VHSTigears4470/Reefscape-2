@@ -7,6 +7,6 @@ public class Operating {
         public static final boolean k_usingElevator = true;
     }
     public static final class Debugging {
-        public static final boolean k_driveDebug = false;
+        public static final boolean k_driveDebug = true;
     }
 }

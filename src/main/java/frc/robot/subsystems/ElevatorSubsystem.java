@@ -7,7 +7,6 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -86,6 +85,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
+    /** Tests the elevator motors at the given speed value. */
     public void testDrive(double speed){
       m_elevatorRight.set(speed);
     }
@@ -99,7 +99,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_elevatorRightClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
     }
 
-    /** Zero the elevator encoder when the bottom limit switch is pressed. (Might have to invert limit switch)*/
+    /** Zero the elevator encoder when the bottom limit switch is pressed. (Might have to invert limit switch) */
     private void zeroElevatorOnBottomLimitSwitch() {
         if (!b_wasResetByLimitBot && !m_elevatorLimitSwitchBottom.get()) {
             // Zero the encoder only when the limit switch is switches from "unpressed" to "pressed" to
@@ -111,11 +111,11 @@ public class ElevatorSubsystem extends SubsystemBase {
         }
     }
 
-    /** Set the elevator encoder when the top limit switch is pressed. (Might have to invert limit switch)*/
+    /** Set the elevator encoder when the top limit switch is pressed. (Might have to invert limit switch) */
     private void setElevatorOnTopLimitSwitch() {
       if (!b_wasResetByLimitTop && !m_elevatorLimitSwitchTop.get()) {
           // Set the encoder only when the limit switch is switches from "unpressed" to "pressed" to
-          // prevent constant zeroing while pressed
+          // prevent constant zeroing while pressed (might have to fine tune position)
           m_elevatorRightEncoder.setPosition(29);
           m_elevatorLeftEncoder.setPosition(29);
           b_wasResetByLimitTop = true;
@@ -124,13 +124,13 @@ public class ElevatorSubsystem extends SubsystemBase {
       }
   }
     
-    //Resests elevator encoders to read a position of 0.
+    /**Resests elevator encoders to read a position of 0. */
     public void resetEncoders() {
         m_elevatorRightEncoder.setPosition(0);
         m_elevatorLeftEncoder.setPosition(0);
     }
 
-    //Stops the elevator's motors
+    /** Stops the elevator's motors. */
     public void stopMotors() {
         m_elevatorRight.stopMotor();
         m_elevatorLeft.stopMotor();

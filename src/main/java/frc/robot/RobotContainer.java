@@ -58,12 +58,19 @@ public class RobotContainer {
 
   
   private void configureBindings() {
-    //apply later
-    m_driverController.y().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kFeederStation));
-    m_driverController.x().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel1));
-    m_driverController.b().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel2));
-    m_driverController.a().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel3));
-    m_driverController.rightBumper().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel4));
+    int preset = 0;
+    switch (preset){ //Add other controller schemes later
+      case 1: //Elevator debugging
+        m_driverController.y().onTrue(new TestElevator(m_elevatorSub, .1));
+        m_driverController.x().onTrue(new TestElevator(m_elevatorSub, -.1));
+        break;
+      default: //Main controller scheme
+        m_driverController.y().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kFeederStation));
+        m_driverController.x().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel1));
+        m_driverController.b().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel2));
+        m_driverController.a().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel3));
+        m_driverController.rightBumper().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel4));
+    }    
   }
 
   public Command getAutonomousCommand() {

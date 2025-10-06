@@ -29,7 +29,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final SparkMax m_elevatorRight;
     private final SparkMax m_elevatorLeft;
     private final SparkClosedLoopController m_elevatorRightClosedLoopController;
-    private final SparkClosedLoopController m_elevatorLeftClosedLoopController;
     private final RelativeEncoder m_elevatorRightEncoder;
     private final RelativeEncoder m_elevatorLeftEncoder;
     private final DigitalInput m_elevatorLimitSwitchTop;
@@ -48,7 +47,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         m_elevatorLeft.configure(Configs.Elevator.elevatorConfigLeft, 
                                  ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);       
         m_elevatorRightClosedLoopController = m_elevatorRight.getClosedLoopController();
-        m_elevatorLeftClosedLoopController = m_elevatorLeft.getClosedLoopController();
         m_elevatorRightEncoder = m_elevatorRight.getEncoder();
         m_elevatorLeftEncoder = m_elevatorLeft.getEncoder();
         resetEncoders();
@@ -98,8 +96,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * setpoints.
      */
     private void moveToSetpoint() {
-        //m_elevatorRightClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
-        m_elevatorLeftClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
+        m_elevatorRightClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
     }
 
     /** Zero the elevator encoder when the bottom limit switch is pressed. (Might have to invert limit switch)*/
@@ -109,7 +106,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             // prevent constant zeroing while pressed
             resetEncoders();
             b_wasResetByLimitBot = true;
-        } else if (!m_elevatorLimitSwitchBottom.get()) {
+        } else if (m_elevatorLimitSwitchBottom.get()) {
             b_wasResetByLimitBot = false;
         }
     }
@@ -122,7 +119,7 @@ public class ElevatorSubsystem extends SubsystemBase {
           m_elevatorRightEncoder.setPosition(29);
           m_elevatorLeftEncoder.setPosition(29);
           b_wasResetByLimitTop = true;
-      } else if (!m_elevatorLimitSwitchTop.get()) {
+      } else if (m_elevatorLimitSwitchTop.get()) {
           b_wasResetByLimitTop = false;
       }
   }
@@ -144,7 +141,6 @@ public class ElevatorSubsystem extends SubsystemBase {
         moveToSetpoint();
         zeroElevatorOnBottomLimitSwitch();
         setElevatorOnTopLimitSwitch();
-        
         // Display subsystem values
         SmartDashboard.putNumber("Coral/Elevator/Target Position", elevatorCurrentTarget);
         SmartDashboard.putNumber("Coral/Elevator/Actual Right Position", m_elevatorRightEncoder.getPosition());

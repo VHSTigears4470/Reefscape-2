@@ -61,6 +61,9 @@ public class RobotContainer {
     //apply later
     m_driverController.y().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kFeederStation));
     m_driverController.x().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel1));
+    m_driverController.b().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel2));
+    m_driverController.a().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel3));
+    m_driverController.rightBumper().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel4));
   }
 
   public Command getAutonomousCommand() {

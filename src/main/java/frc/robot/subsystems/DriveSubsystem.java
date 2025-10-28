@@ -118,20 +118,22 @@ public class DriveSubsystem extends SubsystemBase{
 
     //WIP
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
+        /*
         double multipler = 1;
         double alt = 1;
-        drive(-robotRelativeSpeeds.vxMetersPerSecond/Drive.Constants.k_maxSpeedMetersPerSecond * multipler, 
-        -robotRelativeSpeeds.vyMetersPerSecond/Drive.Constants.k_maxSpeedMetersPerSecond * multipler, 
-        -robotRelativeSpeeds.omegaRadiansPerSecond/Drive.Constants.k_maxAngularSpeed * alt, false, 
+        drive(robotRelativeSpeeds.vxMetersPerSecond/Drive.Constants.k_maxSpeedMetersPerSecond * multipler, 
+        robotRelativeSpeeds.vyMetersPerSecond/Drive.Constants.k_maxSpeedMetersPerSecond * multipler, 
+        robotRelativeSpeeds.omegaRadiansPerSecond/Drive.Constants.k_maxAngularSpeed * alt, false, 
         "AutoBuilder");
-        
-        /*
-         // Stripped from Template Pathplanner Github
+        */
+           
+        // Stripped from Template Pathplanner Github
         ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
-  
-        SwerveModuleState[] targetStates = DriveConstants.k_DriveKinematics.toSwerveModuleStates(targetSpeeds);
-        setModuleStates(targetStates);
-         */
+        SwerveModuleState[] targetStates = Drive.Constants.k_driveKinematics.toSwerveModuleStates(targetSpeeds);
+        m_frontLeft.setDesiredState(targetStates[0]);
+        m_frontRight.setDesiredState(targetStates[1]);
+        m_backLeft.setDesiredState(targetStates[2]);
+        m_backRight.setDesiredState(targetStates[3]);
       }
 
     //returns a list of SwerveModulesStates

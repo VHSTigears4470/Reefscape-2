@@ -47,6 +47,8 @@ public class RobotContainer {
     //Add paths here
     autoChooser.addOption("Forward Right", new PathPlannerAuto("Forward Right"));
     autoChooser.addOption("Test", new PathPlannerAuto("Test"));
+    autoChooser.addOption("Spin", new PathPlannerAuto("Spin"));
+    autoChooser.addOption("Circle", new PathPlannerAuto("Circle"));
     SmartDashboard.putData("Auto Mode", autoChooser);
     
     configureBindings();
@@ -82,11 +84,13 @@ public class RobotContainer {
         m_driverController.x().onTrue(new TestElevator(m_elevatorSub, -.1));
         break;
       default: //Main controller scheme
-        m_driverController.y().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kFeederStation));
-        m_driverController.x().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel1));
-        m_driverController.b().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel2));
-        m_driverController.a().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel3));
-        m_driverController.rightBumper().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel4));
+        if(Operating.Constants.k_usingElevator){
+          m_driverController.y().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kFeederStation));
+          m_driverController.x().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel1));
+          m_driverController.b().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel2));
+          m_driverController.a().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel3));
+          m_driverController.rightBumper().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel4));
+        }
     }    
   }
 

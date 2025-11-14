@@ -43,14 +43,18 @@ public class RobotContainer {
     // Configure the trigger bindings
     initSubystems();
 
-    autoChooser = AutoBuilder.buildAutoChooser("Tests");
-    //Add paths here
-    autoChooser.addOption("Forward Right", new PathPlannerAuto("Forward Right"));
-    autoChooser.addOption("Test", new PathPlannerAuto("Test"));
-    autoChooser.addOption("Spin", new PathPlannerAuto("Spin"));
-    autoChooser.addOption("Circle", new PathPlannerAuto("Circle"));
-    SmartDashboard.putData("Auto Mode", autoChooser);
-    
+    if(Operating.Constants.k_usingDrive){
+      autoChooser = AutoBuilder.buildAutoChooser("Tests");
+      //Add paths here
+      autoChooser.addOption("Forward Right", new PathPlannerAuto("Forward Right"));
+      autoChooser.addOption("Test", new PathPlannerAuto("Test"));
+      autoChooser.addOption("Spin", new PathPlannerAuto("Spin"));
+      autoChooser.addOption("Circle", new PathPlannerAuto("Circle"));
+      SmartDashboard.putData("Auto Mode", autoChooser);
+    } else {
+      autoChooser = null;
+    }
+
     configureBindings();
 
     FollowPathCommand.warmupCommand().schedule();
@@ -96,6 +100,9 @@ public class RobotContainer {
 
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
-    return autoChooser.getSelected();
+    if(Operating.Constants.k_usingDrive)
+      return autoChooser.getSelected();
+    else 
+      return null;
   }
 }

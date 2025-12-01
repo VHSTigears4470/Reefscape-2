@@ -6,9 +6,11 @@ package frc.robot;
 
 import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
+import frc.robot.commands.ChaseTag;
 import frc.robot.commands.TestElevator;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.PoseEstimatorSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem.Setpoint;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -33,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   private DriveSubsystem m_driveSub;
   private ElevatorSubsystem m_elevatorSub;
+  private PoseEstimatorSubsystem m_poseSub;
 
   private final CommandXboxController m_driverController =
       new CommandXboxController(OI.Constants.k_driverControllerPort);
@@ -76,6 +79,9 @@ public class RobotContainer {
     if(Operating.Constants.k_usingElevator) {
       m_elevatorSub = new ElevatorSubsystem();
     } 
+    if(Operating.Constants.k_usingPhotonVision) {
+      m_poseSub = new PoseEstimatorSubsystem(m_driveSub);
+    }
     // extend if-else chain for other subsystems
   }
 
@@ -94,6 +100,9 @@ public class RobotContainer {
           m_driverController.b().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel2));
           m_driverController.a().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel3));
           m_driverController.rightBumper().onTrue(m_elevatorSub.setSetpointCommand(Setpoint.kLevel4));
+        }
+        if(Operating.Constants.k_usingPhotonVision) {
+          m_driverController.leftBumper().whileTrue(new ChaseTag(m_driveSub, m_poseSub::getCurrentPose));
         }
     }    
   }

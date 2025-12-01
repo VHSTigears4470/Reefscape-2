@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import org.photonvision.PhotonCamera;
-import org.photonvision.PhotonUtils;
 
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -78,10 +76,6 @@ public class DriveSubsystem extends SubsystemBase{
         getRotation2d(),
         getSwerveModulePosition());
     
-    private final PhotonCamera camera1 = null;
-    private final PhotonCamera camera2 = null;
-    //Add PhotonPoseEstimator and DrivePoseEstimator
-    
     //Constructs a new DriveSubsystem
     public DriveSubsystem() {
         //Usage reporting for MAXSwerve template
@@ -97,12 +91,6 @@ public class DriveSubsystem extends SubsystemBase{
 
         //Configure AutoBuilder here later
         configureAutoBuilder();
-
-        if(Operating.Constants.k_usingPhotonVision){
-            PhotonCamera camera1 = new PhotonCamera("camera1");
-            PhotonCamera camera2 = new PhotonCamera("camera2");
-            //Add PhotonPoseEstimator and DrivePoseEstimator
-        } 
     }
 
     public void drive(double p_xSpeed, double p_ySpeed, double p_rot, boolean p_fieldRelative, String p_statusName) {
@@ -147,80 +135,6 @@ public class DriveSubsystem extends SubsystemBase{
         m_backLeft.setDesiredState(targetStates[2]);
         m_backRight.setDesiredState(targetStates[3]);
     }
-    
-    public void driveToTag(){
-        boolean targetVisible = false;
-        double targetYaw1 = 0.0;
-        double targetRange1 = 0.0;
-        var results1 = camera1.getAllUnreadResults();
-        if (!results1.isEmpty()) {
-            // Camera processed a new frame since last
-            // Get the last one in the list.
-            var result = results1.get(results1.size() - 1);
-            if (result.hasTargets()) {
-                // At least one AprilTag was seen by the camera
-                for (var target : result.getTargets()) {
-                    if (target.getFiducialId() == 7) { //Change to whatever ID
-                        // Found Tag 7, record its information
-                        targetYaw1 = target.getYaw();
-                        targetRange1 =
-                                PhotonUtils.calculateDistanceToTargetMeters(
-                                        0.5, // Measured with a tape measure, or in CAD (UPDATE)
-                                        1.435, // From 2024 game manual for ID 7 (UPDATE)
-                                        Math.toRadians(-30.0), // Measured with a protractor, or in CAD (UPDATE)
-                                        Math.toRadians(target.getPitch()));
-
-                        targetVisible = true;
-                    }
-                }
-            }
-        }
-
-        double targetYaw2 = 0.0;
-        double targetRange2 = 0.0;
-        var results2 = camera2.getAllUnreadResults();
-        if (!results2.isEmpty()) {
-            // Camera processed a new frame since last
-            // Get the last one in the list.
-            var result = results2.get(results2.size() - 1);
-            if (result.hasTargets()) {
-                // At least one AprilTag was seen by the camera
-                for (var target : result.getTargets()) {
-                    if (target.getFiducialId() == 7) {
-                        // Found Tag 7, record its information
-                        targetYaw2 = target.getYaw();
-                        targetRange2 =
-                                PhotonUtils.calculateDistanceToTargetMeters(
-                                        0.5, // Measured with a tape measure, or in CAD (UPDATE)
-                                        1.435, // From 2024 game manual for ID 7 (UPDATE)
-                                        Math.toRadians(-30.0), // Measured with a protractor, or in CAD (UPDATE)
-                                        Math.toRadians(target.getPitch()));
-
-                        targetVisible = true;
-                    }
-                }
-            }
-        }
-
-        double targetYaw = (targetYaw1 + targetYaw2) / 2;
-        double targetRange = (targetRange1 + targetRange2) / 2;
-
-        if (targetVisible) {
-            // Driver wants auto-alignment to tag 7
-            // And, tag 7 is in sight, so we can turn toward it.
-            // Override the driver's turn and fwd/rev command with an automatic one
-            // That turns toward the tag, and gets the range right.
-            
-            /*
-            turn =
-                    (VISION_DES_ANGLE_deg - targetYaw) * VISION_TURN_kP * Constants.Swerve.kMaxAngularSpeed;
-            forward =
-                    (VISION_DES_RANGE_m - targetRange) * VISION_STRAFE_kP * Constants.Swerve.kMaxLinearSpeed;
-
-            drive()
-            */
-        }
-    }
 
     //returns a list of SwerveModulesStates
     public SwerveModuleState[] getSwerveModuleState() {
@@ -246,7 +160,7 @@ public class DriveSubsystem extends SubsystemBase{
     public Rotation2d getRotation2d() {
         //return new Rotation2d(edu.wpi.first.math.util.Units.degreesToRadians(0)); //This way avoids issues
         if(Operating.Constants.k_usingGyro) 
-            return new Rotation2d(m_gyro.getYaw().getValue());
+            return new Rotation2d(m_gyro.getYaw().getValue()); //might have to invert (360 - yaw)
         else 
             return new Rotation2d(0);
     }

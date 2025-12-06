@@ -14,7 +14,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.Cameras;
+import frc.robot.Constants.Vision;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class ChaseTag extends Command{
@@ -77,9 +77,9 @@ public class ChaseTag extends Command{
                         var transform = new Transform2d(
                             camToTarget.getTranslation().toTranslation2d(),
                             camToTarget.getRotation().toRotation2d().minus(Rotation2d.fromDegrees(90)));
-                        var cameraPose = robotPose.transformBy(Cameras.Constants.CAMERA_TO_ROBOT[i]); 
-                        Pose2d targetPose = cameraPose.transformBy(transform);
-                        goalPose[i] = targetPose.transformBy(TAG_TO_GOAL);
+                        //var cameraPose = robotPose.transformBy(Vision.Constants.CAMERA_TO_ROBOT[i]); 
+                        //Pose2d targetPose = cameraPose.transformBy(transform);
+                        //goalPose[i] = targetPose.transformBy(TAG_TO_GOAL);
                     }
                     int numGoals = 0;
                     double xGoal = 0;

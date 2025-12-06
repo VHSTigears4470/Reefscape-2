@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 
+
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.config.PIDConstants;
@@ -10,6 +11,7 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,8 +21,10 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -28,7 +32,9 @@ import frc.robot.Constants.Configs;
 import frc.robot.Constants.Drive;
 import frc.robot.Constants.IDs;
 import frc.robot.Constants.Operating;
+import frc.robot.Constants.Vision;
 import frc.robot.Constants.Drive.Constants.MotorLocation;
+import frc.robot.Constants.Vision.VisionIOInputs;
 
 //Drive Subsystem
 public class DriveSubsystem extends SubsystemBase{
@@ -70,11 +76,19 @@ public class DriveSubsystem extends SubsystemBase{
     private SwerveModuleState m_desiredStates[] = {new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState(), new SwerveModuleState()};
     private StructArrayPublisher<SwerveModuleState> publisherDesieredStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyDesiredStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
+    private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
+
      
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
         Drive.Constants.k_driveKinematics,
         getRotation2d(),
         getSwerveModulePosition());
+
+    private final VisionIOPhoton visionIO = new VisionIOPhoton();
+    private final VisionIOInputs visionInputs = new VisionIOInputs();
+    private SwerveDrivePoseEstimator poseEstimator =
+        new SwerveDrivePoseEstimator(Drive.Constants.k_driveKinematics, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
+            Vision.Constants.kSingleTagStdDevs, Vision.Constants.kSingleTagStdDevs);
     
     //Constructs a new DriveSubsystem
     public DriveSubsystem() {
@@ -118,15 +132,6 @@ public class DriveSubsystem extends SubsystemBase{
     }
 
     public void driveRobotRelative(ChassisSpeeds robotRelativeSpeeds) {
-        /*
-        double multipler = 1;
-        double alt = 1;
-        drive(robotRelativeSpeeds.vxMetersPerSecond/Drive.Constants.k_maxSpeedMetersPerSecond * multipler, 
-        robotRelativeSpeeds.vyMetersPerSecond/Drive.Constants.k_maxSpeedMetersPerSecond * multipler, 
-        robotRelativeSpeeds.omegaRadiansPerSecond/Drive.Constants.k_maxAngularSpeed * alt, false, 
-        "AutoBuilder");
-        */
-           
         // Stripped from Template Pathplanner Github
         ChassisSpeeds targetSpeeds = ChassisSpeeds.discretize(robotRelativeSpeeds, 0.02);
         SwerveModuleState[] targetStates = Drive.Constants.k_driveKinematics.toSwerveModuleStates(targetSpeeds);
@@ -252,6 +257,16 @@ public class DriveSubsystem extends SubsystemBase{
             m_frontRight.updateSmartDashboard();
             m_backLeft.updateSmartDashboard();
             m_backRight.updateSmartDashboard();
+        }
+        if(Operating.Constants.k_usingPhotonVision) {
+            poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
+            visionIO.updateInputs(visionInputs, getPose());
+            if(visionInputs.hasEstimate){
+                for(int i = 0; i < visionInputs.estimate.length; i++) {
+                    poseEstimator.addVisionMeasurement(visionInputs.estimate[i], Timer.getFPGATimestamp());
+                }
+            }  
+            publisherPose.set(poseEstimator.getEstimatedPosition());
         }
     }
 

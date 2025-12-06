@@ -5,6 +5,7 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -65,6 +66,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command setSetpointCommand(Setpoint setpoint) {
         return this.runOnce(
         () -> {
+          m_elevatorRight.stopMotor();
           switch (setpoint) {
             case kFeederStation:
               elevatorCurrentTarget = ElevatorSetpoints.kFeederStation;
@@ -96,7 +98,7 @@ public class ElevatorSubsystem extends SubsystemBase {
      * setpoints.
      */
     private void moveToSetpoint() {
-        m_elevatorRightClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl);
+        m_elevatorRightClosedLoopController.setReference(elevatorCurrentTarget, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, 0.2);
     }
 
     /** Zero the elevator encoder when the bottom limit switch is pressed. (Might have to invert limit switch) */

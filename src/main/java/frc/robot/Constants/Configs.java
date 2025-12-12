@@ -103,7 +103,7 @@ public final class Configs {
             elevatorConfigRight.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control - Edit
-                .p(0.10)
+                .p(0.12)
                 .outputRange(-1, 1)
                 .maxMotion
                 // Set MAXMotion parameters for position control - Edit
@@ -118,7 +118,7 @@ public final class Configs {
             elevatorConfigLeft.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 // Set PID values for position control - Edit
-                .p(0.10)
+                .p(0.12)
                 .outputRange(-1, 1)
                 .maxMotion
                 // Set MAXMotion parameters for position control - Edit

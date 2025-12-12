@@ -18,9 +18,9 @@ public class Vision {
         public static final Transform3d[] CAMERA_TO_ROBOT = //Adjust
         {
          new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(-8), Units.inchesToMeters(6)), 
-            new Rotation3d(0, 60, 0)),
-         new Transform3d(new Translation3d(Units.inchesToMeters(16), Units.inchesToMeters(8), Units.inchesToMeters(6)), 
-            new Rotation3d(0, 60, 0))
+            new Rotation3d(0, Units.degreesToRadians(60), 0)),
+         new Transform3d(new Translation3d(Units.inchesToMeters(90), Units.inchesToMeters(8), Units.inchesToMeters(6)), 
+            new Rotation3d(0, Units.degreesToRadians(60), 0))
         };
         public static final AprilTagFieldLayout m_targetPoses = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
         //Adjust

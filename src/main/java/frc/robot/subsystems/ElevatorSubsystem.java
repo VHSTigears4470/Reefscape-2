@@ -66,8 +66,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command setSetpointCommand(Setpoint setpoint) {
         return this.runOnce(
         () -> {
-          m_elevatorRight.stopMotor();
-          switch (setpoint) {
+            switch (setpoint) {
             case kFeederStation:
               elevatorCurrentTarget = ElevatorSetpoints.kFeederStation;
               break;
@@ -84,6 +83,7 @@ public class ElevatorSubsystem extends SubsystemBase {
               elevatorCurrentTarget = ElevatorSetpoints.kLevel4;
               break;
           }
+          moveToSetpoint();
         });
     }
 
@@ -140,7 +140,6 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        moveToSetpoint();
         zeroElevatorOnBottomLimitSwitch();
         setElevatorOnTopLimitSwitch();
         // Display subsystem values

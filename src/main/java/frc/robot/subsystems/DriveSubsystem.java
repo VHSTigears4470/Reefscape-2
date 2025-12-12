@@ -77,6 +77,9 @@ public class DriveSubsystem extends SubsystemBase{
     private StructArrayPublisher<SwerveModuleState> publisherDesieredStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyDesiredStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
     private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
+    private StructPublisher<Pose2d> publisherPose1 = NetworkTableInstance.getDefault().getStructTopic("Pose1", Pose2d.struct).publish();
+    private StructPublisher<Pose2d> publisherPose2 = NetworkTableInstance.getDefault().getStructTopic("Pose2", Pose2d.struct).publish();
+
 
      
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -263,6 +266,10 @@ public class DriveSubsystem extends SubsystemBase{
             visionIO.updateInputs(visionInputs, getPose());
             if(visionInputs.hasEstimate){
                 for(int i = 0; i < visionInputs.estimate.length; i++) {
+                    if(i == 0)
+                        publisherPose1.set(visionInputs.estimate[i]);
+                    else
+                        publisherPose2.set(visionInputs.estimate[i]);
                     poseEstimator.addVisionMeasurement(visionInputs.estimate[i], Timer.getFPGATimestamp());
                 }
             }  

@@ -10,6 +10,8 @@ import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
+import edu.wpi.first.apriltag.AprilTagDetector;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,17 +30,19 @@ public class VisionIOPhoton extends SubsystemBase{
 
     private final PhotonCamera camera2;
     private final PhotonPoseEstimator camera2Estimator;
+    private final AprilTagFieldLayout layout = Vision.Constants.m_targetPoses;
 
     public VisionIOPhoton() {
         PortForwarder.add(5810, "10.44.70.203", 5810);
+        layout.setOrigin(AprilTagFieldLayout.OriginPosition.kBlueAllianceWallRightSide);
 
         camera1 = new PhotonCamera("camera1");
-        camera1Estimator = new PhotonPoseEstimator(Vision.Constants.m_targetPoses, 
+        camera1Estimator = new PhotonPoseEstimator(layout, 
             PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[0]);
         camera1Estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
 
         camera2 = new PhotonCamera("camera2");
-        camera2Estimator = new PhotonPoseEstimator(Vision.Constants.m_targetPoses,
+        camera2Estimator = new PhotonPoseEstimator(layout,
              PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, Vision.Constants.CAMERA_TO_ROBOT[1]);
         camera2Estimator.setMultiTagFallbackStrategy(PoseStrategy.LOWEST_AMBIGUITY);
     }
@@ -164,7 +168,7 @@ public class VisionIOPhoton extends SubsystemBase{
         for (int i = 0; i < results.length; i++) {
             if (results[i].hasTargets()) {
                 for (PhotonTrackedTarget target : results[i].getTargets()) {
-                    targets[index] = Vision.Constants.m_targetPoses.getTagPose(target.getFiducialId()).get();
+                    targets[index] = layout.getTagPose(target.getFiducialId()).get();
                     index++;
                 }
             }
@@ -194,7 +198,7 @@ public class VisionIOPhoton extends SubsystemBase{
         double avgDist = 0;
         int[] targets = getCameraTargets(inputs)[camera];
         for (var tgt : targets) {
-            Optional<Pose3d> tagPose = Vision.Constants.m_targetPoses.getTagPose(tgt);
+            Optional<Pose3d> tagPose = layout.getTagPose(tgt);
             if (tagPose.isEmpty())
                 continue;
             numTags++;

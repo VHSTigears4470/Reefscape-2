@@ -11,6 +11,8 @@ import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import edu.wpi.first.hal.HAL;
 import edu.wpi.first.hal.FRCNetComm.tInstances;
 import edu.wpi.first.hal.FRCNetComm.tResourceType;
+import edu.wpi.first.math.Matrix;
+import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -19,6 +21,8 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N1;
+import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.networktables.StructPublisher;
@@ -32,9 +36,7 @@ import frc.robot.Constants.Configs;
 import frc.robot.Constants.Drive;
 import frc.robot.Constants.IDs;
 import frc.robot.Constants.Operating;
-import frc.robot.Constants.Vision;
 import frc.robot.Constants.Drive.Constants.MotorLocation;
-import frc.robot.Constants.Vision.VisionIOInputs;
 
 //Drive Subsystem
 public class DriveSubsystem extends SubsystemBase{
@@ -77,21 +79,15 @@ public class DriveSubsystem extends SubsystemBase{
     private StructArrayPublisher<SwerveModuleState> publisherDesieredStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyDesiredStates", SwerveModuleState.struct).publish();
     private StructArrayPublisher<SwerveModuleState> publisherActualStates = NetworkTableInstance.getDefault().getStructArrayTopic("MyActualStates", SwerveModuleState.struct).publish();
     private StructPublisher<Pose2d> publisherPose = NetworkTableInstance.getDefault().getStructTopic("SwervePose", Pose2d.struct).publish();
-    private StructPublisher<Pose2d> publisherPose1 = NetworkTableInstance.getDefault().getStructTopic("Pose1", Pose2d.struct).publish();
-    private StructPublisher<Pose2d> publisherPose2 = NetworkTableInstance.getDefault().getStructTopic("Pose2", Pose2d.struct).publish();
-
-
      
     SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
         Drive.Constants.k_driveKinematics,
         getRotation2d(),
         getSwerveModulePosition());
 
-    private final VisionIOPhoton visionIO = new VisionIOPhoton();
-    private final VisionIOInputs visionInputs = new VisionIOInputs();
     private SwerveDrivePoseEstimator poseEstimator =
         new SwerveDrivePoseEstimator(Drive.Constants.k_driveKinematics, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
-            Vision.Constants.kSingleTagStdDevs, Vision.Constants.kSingleTagStdDevs);
+            VecBuilder.fill(0.1, 0.1, 0.1), VecBuilder.fill(1,1,1));
     
     //Constructs a new DriveSubsystem
     public DriveSubsystem() {
@@ -246,6 +242,10 @@ public class DriveSubsystem extends SubsystemBase{
         }
     }
 
+    public void addVisionMeasurement(Pose2d visionMeasurement, double timestampSeconds, Matrix<N3, N1> stdDevs) {
+        poseEstimator.addVisionMeasurement(visionMeasurement, timestampSeconds, stdDevs);
+    }
+
     @Override
     public void periodic() {
         m_odometry.update(getRotation2d(), getSwerveModulePosition());
@@ -263,16 +263,6 @@ public class DriveSubsystem extends SubsystemBase{
         }
         if(Operating.Constants.k_usingPhotonVision) {
             poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
-            visionIO.updateInputs(visionInputs, getPose());
-            if(visionInputs.hasEstimate){
-                for(int i = 0; i < visionInputs.estimate.length; i++) {
-                    if(i == 0)
-                        publisherPose1.set(visionInputs.estimate[i]);
-                    else
-                        publisherPose2.set(visionInputs.estimate[i]);
-                    poseEstimator.addVisionMeasurement(visionInputs.estimate[i], Timer.getFPGATimestamp());
-                }
-            }  
             publisherPose.set(poseEstimator.getEstimatedPosition());
         }
     }

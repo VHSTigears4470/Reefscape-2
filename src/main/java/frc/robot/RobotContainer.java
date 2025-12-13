@@ -10,6 +10,7 @@ import frc.robot.commands.ChaseTag;
 import frc.robot.commands.TestElevator;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.VisionIO;
 import frc.robot.subsystems.ElevatorSubsystem.Setpoint;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -34,6 +35,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   private DriveSubsystem m_driveSub;
   private ElevatorSubsystem m_elevatorSub;
+  private VisionIO m_visionSub;
 
   private final CommandXboxController m_driverController =
       new CommandXboxController(OI.Constants.k_driverControllerPort);
@@ -77,6 +79,9 @@ public class RobotContainer {
     if(Operating.Constants.k_usingElevator) {
       m_elevatorSub = new ElevatorSubsystem();
     } 
+    if(Operating.Constants.k_usingPhotonVision) {
+      m_visionSub = new VisionIO(m_driveSub::addVisionMeasurement);
+    }
     // extend if-else chain for other subsystems
   }
 

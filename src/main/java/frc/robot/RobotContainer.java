@@ -6,10 +6,12 @@ package frc.robot;
 
 import frc.robot.Constants.OI;
 import frc.robot.Constants.Operating;
+import frc.robot.Constants.Vision.VisionIOInputs;
 import frc.robot.commands.ChaseTag;
 import frc.robot.commands.TestElevator;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.VisionIOPhoton;
 import frc.robot.subsystems.ElevatorSubsystem.Setpoint;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -23,6 +25,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
+import java.util.Optional;
+
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -34,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 public class RobotContainer {
   private DriveSubsystem m_driveSub;
   private ElevatorSubsystem m_elevatorSub;
+  private VisionIOPhoton m_photonVision;
 
   private final CommandXboxController m_driverController =
       new CommandXboxController(OI.Constants.k_driverControllerPort);
@@ -62,8 +67,11 @@ public class RobotContainer {
   }
 
   public void initSubystems() {
+    if(Operating.Constants.k_usingPhotonVision) {
+      m_photonVision = new VisionIOPhoton();
+    }
     if(Operating.Constants.k_usingDrive) {
-      m_driveSub = new DriveSubsystem();
+      m_driveSub = new DriveSubsystem(Optional.ofNullable(m_photonVision));
       m_driveSub.setDefaultCommand(new RunCommand(
         () -> m_driveSub.drive(
                   OI.Constants.k_driverYAxisInverted * MathUtil.applyDeadband(m_driverController.getRawAxis(OI.Constants.k_driverAxisY), OI.Constants.k_driveDeadband),

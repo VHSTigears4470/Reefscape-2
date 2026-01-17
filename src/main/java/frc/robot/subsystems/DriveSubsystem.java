@@ -35,6 +35,7 @@ import frc.robot.Constants.Operating;
 import frc.robot.Constants.Vision;
 import frc.robot.Constants.Drive.Constants.MotorLocation;
 import frc.robot.Constants.Vision.VisionIOInputs;
+import java.util.Optional;
 
 //Drive Subsystem
 public class DriveSubsystem extends SubsystemBase{
@@ -87,17 +88,26 @@ public class DriveSubsystem extends SubsystemBase{
         getRotation2d(),
         getSwerveModulePosition());
 
-    private final VisionIOPhoton visionIO = new VisionIOPhoton();
-    private final VisionIOInputs visionInputs = new VisionIOInputs();
+    private VisionIOPhoton visionIO = null;
     private SwerveDrivePoseEstimator poseEstimator =
         new SwerveDrivePoseEstimator(Drive.Constants.k_driveKinematics, getRotation2d(), getSwerveModulePosition(), new Pose2d(),
             Vision.Constants.kSingleTagStdDevs, Vision.Constants.kSingleTagStdDevs);
     
     //Constructs a new DriveSubsystem
-    public DriveSubsystem() {
+    public DriveSubsystem(Optional<VisionIOPhoton> photonVision)
+    {
         //Usage reporting for MAXSwerve template
         HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_MaxSwerve);
         RobotConfig config;
+
+        if(photonVision.isEmpty())
+        {
+            visionIO = new VisionIOPhoton();
+        }
+        else
+        {
+            visionIO = photonVision.get(); 
+        }
 
         try {
             config = RobotConfig.fromGUISettings();
@@ -263,14 +273,10 @@ public class DriveSubsystem extends SubsystemBase{
         }
         if(Operating.Constants.k_usingPhotonVision) {
             poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getRotation2d(), getSwerveModulePosition());
-            visionIO.updateInputs(visionInputs, getPose());
-            if(visionInputs.hasEstimate){
-                for(int i = 0; i < visionInputs.estimate.length; i++) {
-                    if(i == 0)
-                        publisherPose1.set(visionInputs.estimate[i]);
-                    else
-                        publisherPose2.set(visionInputs.estimate[i]);
-                    poseEstimator.addVisionMeasurement(visionInputs.estimate[i], Timer.getFPGATimestamp());
+            VisionIOInputs inputs = visionIO.getInputs();
+            for(int i = 0; i < inputs.cameraPoses.length; i++) {
+                if(null != inputs.cameraTargets[i]) {
+                    poseEstimator.addVisionMeasurement(inputs.cameraPoses[i].toPose2d(), Timer.getFPGATimestamp());
                 }
             }  
             publisherPose.set(poseEstimator.getEstimatedPosition());
